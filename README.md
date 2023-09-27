@@ -1,6 +1,6 @@
 # homesensor
 
-This is using Lilygo ESP32-S3 and CSS811 sensor to make a mini home CO2 and TVO indicator.
+This is using Lilygo ESP32-S3 and CCS811 sensor to make a mini home CO2 and TVO indicator.
 Worked on 5hrs for v1.
 
 related resources:
