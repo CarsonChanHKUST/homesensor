@@ -64,8 +64,8 @@ void drawGraph() //background elements
   sprite.drawString("600", 220, 65);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
   sprite.drawString("ppb", 300, 125);
-  sprite.drawString("1200", 220, 105);
-  sprite.drawString("600", 220, 125);
+  sprite.drawString("600", 220, 105);
+  sprite.drawString("300", 220, 125);
   sprite.drawString("0", 220, 145);
 
   // sprite.drawRect(200,20,2,50,TFT_WHITE);//vert
@@ -106,9 +106,9 @@ void update_data(){
       CO2Color = DARKGREEN;
     }
   
-  if (tvocint > 1200){
+  if (tvocint > 600){
     TVOCColor = TFT_RED;
-  }else if(tvocint > 600){
+  }else if(tvocint > 300){
     TVOCColor = DARKYELLOW;
   }else{
     TVOCColor = DARKGREEN;
@@ -125,14 +125,14 @@ void update_data(){
   {
       if (CO2Arr[i]>40){
       sprite.drawPixel(90+i,70-CO2Arr[i],TFT_RED);
-      }else if(CO2Arr[i]>40){
+      }else if(CO2Arr[i]>20){
       sprite.drawPixel(90+i,70-CO2Arr[i],TFT_YELLOW);
       }else{
       sprite.drawPixel(90+i,70-CO2Arr[i],TFT_GREEN);
       }
       if (TVOCArr[i]>40){
       sprite.drawPixel(90+i,150-TVOCArr[i],TFT_RED);
-      }else if(TVOCArr[i]>40){
+      }else if(TVOCArr[i]>20){
       sprite.drawPixel(90+i,150-TVOCArr[i],TFT_YELLOW);
       }else{
       sprite.drawPixel(90+i,150-TVOCArr[i],TFT_GREEN);
@@ -154,12 +154,12 @@ void loop() {
       if(!ccs.readData()){
         Serial.print("CO2: ");
         co2int = ccs.geteCO2();
-        CO2Arr[109]=co2int/20;
-        Serial.print(co2data);
+        CO2Arr[109]=((co2int/32)-12);
+        Serial.print(co2int/32-12);
         Serial.print("ppm, TVOC: ");
         tvocint = ccs.getTVOC();
-        TVOCArr[109]=tvocint/20;
-        Serial.println(tvocdata);
+        TVOCArr[109]=tvocint/10;
+        Serial.println(tvocint);
         update_data();
       }
       else{
