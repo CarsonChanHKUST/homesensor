@@ -7,12 +7,11 @@ TFT_eSprite sprite= TFT_eSprite(&tft);
 
 #define DARKGREEN 0x1CC5 //darkgreen
 #define DARKYELLOW 0xBE00 //darkyellow
-int CO2Color= DARKGREEN, TVOCColor= DARKGREEN, TEMPColor = DARKGREEN;
+int CO2Color= DARKGREEN, TVOCColor= DARKGREEN;
 
 
 // Create the sensor object
 Adafruit_CCS811 ccs;
-//float temp = ccs.calculateTemperature();
 
 int sda = 18;
 int scl = 17;
@@ -41,12 +40,11 @@ void setup() {
 }
 
 
-void drawGraph()
+void drawGraph() //background elements
   { 
-  sprite.fillSprite(TFT_DARKGREY);
-  sprite.fillRoundRect(20,10,170,70,10,CO2Color);  //CO2
-  sprite.fillRoundRect(20,90,170,70,10,TVOCColor); //TVOC
-  sprite.fillRoundRect(220,10,85,150,10,TEMPColor);//TEMP
+  sprite.fillSprite(TFT_BLACK);
+  sprite.fillRoundRect(20,10,300,70,10,CO2Color);  //CO2
+  sprite.fillRoundRect(20,90,300,70,10,TVOCColor); //TVOC
 
   sprite.setTextDatum(4);
   sprite.setTextSize(3);
@@ -54,23 +52,26 @@ void drawGraph()
   sprite.drawString("CO2", 55, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
   sprite.drawString("TVOC", 65, 125);
-  sprite.setTextColor(TFT_WHITE, TEMPColor);
-  sprite.drawString("TEMP", 265, 30);
 
   sprite.setTextSize(1);
   sprite.setTextColor(TFT_WHITE, CO2Color);
-  sprite.drawString("ppm", 170, 45);
+  sprite.drawString("ppm", 240, 45);
+  sprite.drawString("1800", 190, 25);
+  sprite.drawString("1000", 190, 45);
+  sprite.drawString("600", 190, 65);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString("ppb", 170, 125);
+  sprite.drawString("ppb", 240, 125);
+  sprite.drawString("1200", 190, 105);
+  sprite.drawString("600", 190, 125);
+  sprite.drawString("0", 190, 145);
   
 //future development: use sprite.drawPixel(60+j,110-(i*10),color1); to draw the linegraph how the trend goes.
 
-  sprite.pushSprite(0,0);
+  //sprite.pushSprite(0,0);
   }
 
 void update_data(){
   
-
   if (co2int > 1600){
     CO2Color = TFT_RED;
     }else if(co2int > 800){
@@ -79,9 +80,9 @@ void update_data(){
       CO2Color = DARKGREEN;
     }
   
-  if (tvocint > 1000){
+  if (tvocint > 1200){
     TVOCColor = TFT_RED;
-  }else if(tvocint > 500){
+  }else if(tvocint > 600){
     TVOCColor = DARKYELLOW;
   }else{
     TVOCColor = DARKGREEN;
@@ -90,9 +91,9 @@ void update_data(){
   
   sprite.setTextSize(2);
   sprite.setTextColor(TFT_WHITE, CO2Color);
-  sprite.drawString(co2data, 120, 45);
+  sprite.drawString(String(co2int), 190, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString(tvocdata, 140, 125);
+  sprite.drawString(String(tvocint), 210, 125);
   sprite.pushSprite(0,0);
   
   
@@ -105,11 +106,9 @@ void loop() {
   if(ccs.available()){
       if(!ccs.readData()){
         Serial.print("CO2: ");
-        co2data = ccs.geteCO2();
         co2int = ccs.geteCO2();
         Serial.print(co2data);
         Serial.print("ppm, TVOC: ");
-        tvocdata = ccs.getTVOC();
         tvocint = ccs.getTVOC();
         Serial.println(tvocdata);
         update_data();
@@ -120,17 +119,6 @@ void loop() {
       }
     }
     delay(500);
-//  if(ccs.available()){
-    
-//     if(!ccs.readData()){
-//       Serial.println("CO2: "+String(ccs.geteCO2())+"ppm, TVOC: "+String(ccs.getTVOC())+"ppb   Temp:"+String(temp));
-//       update_data();
-//     }
-//     else{
-//       Serial.println("Sensor read ERROR!");
-//       ccs.readData();
-//     }
-//   }
-//   delay(500);
+
 
 }
