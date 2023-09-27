@@ -3,6 +3,8 @@
 This is using Lilygo ESP32-S3 and CCS811 sensor to make a mini home CO2 and TVO indicator.
 Worked on 5hrs for v1.
 
+v2 with improved ui took me another 2 hrs.
+
 related resources:
 
 TFT basic： https://www.youtube.com/watch?v=WFVjsxFMbSM
