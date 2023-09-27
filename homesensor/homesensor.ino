@@ -19,6 +19,9 @@ int scl = 17;
 String co2data, tvocdata;
 int co2int=0, tvocint=0;
 
+int CO2Arr[110]= { };
+int TVOCArr[110]= { };
+
 void setup() {
   
   tft.init();
@@ -77,6 +80,24 @@ void drawGraph() //background elements
 
 void update_data(){
   
+  //if have time optimize to no operation when zero is in the array
+  //shifting array element to the left
+
+  int temp = CO2Arr[0]; //remember first element
+  for(int i=0;i<110-1;i++)
+  {
+      CO2Arr[i] = CO2Arr[i+1]; //move all element to the left except first one
+  }
+  CO2Arr[110-1] = temp;
+  temp = TVOCArr[0]; //remember first element
+  for(int i=0;i<110-1;i++)
+  {
+      TVOCArr[i] = TVOCArr[i+1]; //move all element to the left except first one
+  }
+  TVOCArr[110-1] = temp;
+  
+
+
   if (co2int > 1600){
     CO2Color = TFT_RED;
     }else if(co2int > 800){
@@ -99,6 +120,27 @@ void update_data(){
   sprite.drawString(String(co2int), 260, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
   sprite.drawString(String(tvocint), 270, 125);
+
+  for(int i=110;i>1;i--)
+  {
+      if (CO2Arr[i]>40){
+      sprite.drawPixel(90+i,70-CO2Arr[i],TFT_RED);
+      }else if(CO2Arr[i]>40){
+      sprite.drawPixel(90+i,70-CO2Arr[i],TFT_YELLOW);
+      }else{
+      sprite.drawPixel(90+i,70-CO2Arr[i],TFT_GREEN);
+      }
+      if (TVOCArr[i]>40){
+      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_RED);
+      }else if(TVOCArr[i]>40){
+      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_YELLOW);
+      }else{
+      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_GREEN);
+      }
+
+  }
+  
+
   sprite.pushSprite(0,0);
   
   
@@ -112,9 +154,11 @@ void loop() {
       if(!ccs.readData()){
         Serial.print("CO2: ");
         co2int = ccs.geteCO2();
+        CO2Arr[109]=co2int/20;
         Serial.print(co2data);
         Serial.print("ppm, TVOC: ");
         tvocint = ccs.getTVOC();
+        TVOCArr[109]=tvocint/20;
         Serial.println(tvocdata);
         update_data();
       }
