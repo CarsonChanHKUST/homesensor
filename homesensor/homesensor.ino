@@ -55,15 +55,20 @@ void drawGraph() //background elements
 
   sprite.setTextSize(1);
   sprite.setTextColor(TFT_WHITE, CO2Color);
-  sprite.drawString("ppm", 240, 45);
-  sprite.drawString("1800", 190, 25);
-  sprite.drawString("1000", 190, 45);
-  sprite.drawString("600", 190, 65);
+  sprite.drawString("ppm", 300, 45);
+  sprite.drawString("1800", 220, 25);
+  sprite.drawString("1000", 220, 45);
+  sprite.drawString("600", 220, 65);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString("ppb", 240, 125);
-  sprite.drawString("1200", 190, 105);
-  sprite.drawString("600", 190, 125);
-  sprite.drawString("0", 190, 145);
+  sprite.drawString("ppb", 300, 125);
+  sprite.drawString("1200", 220, 105);
+  sprite.drawString("600", 220, 125);
+  sprite.drawString("0", 220, 145);
+
+  // sprite.drawRect(200,20,2,50,TFT_WHITE);//vert
+  // sprite.drawRect(90,70,110,2,TFT_WHITE);//horz
+  // sprite.drawRect(200,100,2,50,TFT_WHITE);
+  // sprite.drawRect(90,150,110,2,TFT_WHITE);
   
 //future development: use sprite.drawPixel(60+j,110-(i*10),color1); to draw the linegraph how the trend goes.
 
@@ -91,9 +96,9 @@ void update_data(){
   
   sprite.setTextSize(2);
   sprite.setTextColor(TFT_WHITE, CO2Color);
-  sprite.drawString(String(co2int), 190, 45);
+  sprite.drawString(String(co2int), 260, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString(String(tvocint), 210, 125);
+  sprite.drawString(String(tvocint), 270, 125);
   sprite.pushSprite(0,0);
   
   
