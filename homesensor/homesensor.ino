@@ -1,4 +1,5 @@
 #include "Adafruit_CCS811.h"
+#include "SparkFun_SCD4x_Arduino_Library.h"
 #include <TFT_eSPI.h>
 #include <Wire.h>
 
@@ -12,15 +13,15 @@ int CO2Color= DARKGREEN, TVOCColor= DARKGREEN;
 
 // Create the sensor object
 Adafruit_CCS811 ccs;
+SCD4x mySensor;
 
 int sda = 18;
 int scl = 17;
 
 String co2data, tvocdata;
-int co2int=0, tvocint=0;
+int co2int=0, temperature=0, humidity=0;
 
 int CO2Arr[110]= { };
-int TVOCArr[110]= { };
 
 void setup() {
   
@@ -30,16 +31,14 @@ void setup() {
   Wire.begin(sda, scl);
   Serial.begin(9600);
 
-  Serial.println("CCS811 test");
 
-  if(!ccs.begin()){
-    Serial.println("Failed to start sensor! Please check your wiring.");
-    while(1);
+  if (mySensor.begin() == false)
+  {
+    Serial.println(F("Sensor not detected. Please check wiring. Freezing..."));
+    while (1)
+      ;
   }
 
-  // Wait for the sensor to be ready
-  while(!ccs.available());
-  drawGraph();
 }
 
 
@@ -54,7 +53,8 @@ void drawGraph() //background elements
   sprite.setTextColor(TFT_WHITE, CO2Color);
   sprite.drawString("CO2", 55, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString("TVOC", 65, 125);
+  sprite.drawString("%RH", 65, 125);
+  sprite.drawString("TEMP", 200, 125);
 
   sprite.setTextSize(1);
   sprite.setTextColor(TFT_WHITE, CO2Color);
@@ -63,17 +63,14 @@ void drawGraph() //background elements
   sprite.drawString("1000", 220, 45);
   sprite.drawString("600", 220, 65);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString("ppb", 300, 125);
-  sprite.drawString("600", 220, 105);
-  sprite.drawString("300", 220, 125);
-  sprite.drawString("0", 220, 145);
+  sprite.drawString("oC", 300, 125);
+  sprite.drawString("%", 140, 125);
 
   // sprite.drawRect(200,20,2,50,TFT_WHITE);//vert
   // sprite.drawRect(90,70,110,2,TFT_WHITE);//horz
   // sprite.drawRect(200,100,2,50,TFT_WHITE);
   // sprite.drawRect(90,150,110,2,TFT_WHITE);
   
-//future development: use sprite.drawPixel(60+j,110-(i*10),color1); to draw the linegraph how the trend goes.
 
   //sprite.pushSprite(0,0);
   }
@@ -89,12 +86,7 @@ void update_data(){
       CO2Arr[i] = CO2Arr[i+1]; //move all element to the left except first one
   }
   CO2Arr[110-1] = temp;
-  temp = TVOCArr[0]; //remember first element
-  for(int i=0;i<110-1;i++)
-  {
-      TVOCArr[i] = TVOCArr[i+1]; //move all element to the left except first one
-  }
-  TVOCArr[110-1] = temp;
+
   
 
 
@@ -106,9 +98,9 @@ void update_data(){
       CO2Color = DARKGREEN;
     }
   
-  if (tvocint > 600){
+  if (temperature > 600){
     TVOCColor = TFT_RED;
-  }else if(tvocint > 300){
+  }else if(temperature > 300){
     TVOCColor = DARKYELLOW;
   }else{
     TVOCColor = DARKGREEN;
@@ -119,7 +111,8 @@ void update_data(){
   sprite.setTextColor(TFT_WHITE, CO2Color);
   sprite.drawString(String(co2int), 260, 45);
   sprite.setTextColor(TFT_WHITE, TVOCColor);
-  sprite.drawString(String(tvocint), 270, 125);
+  sprite.drawString(String(temperature), 270, 125);
+  sprite.drawString(String(humidity), 120, 125);
 
   for(int i=110;i>1;i--)
   {
@@ -130,14 +123,6 @@ void update_data(){
       }else{
       sprite.drawPixel(90+i,70-CO2Arr[i],TFT_GREEN);
       }
-      if (TVOCArr[i]>40){
-      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_RED);
-      }else if(TVOCArr[i]>20){
-      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_YELLOW);
-      }else{
-      sprite.drawPixel(90+i,150-TVOCArr[i],TFT_GREEN);
-      }
-
   }
   
 
@@ -149,25 +134,32 @@ void update_data(){
 }
 
 void loop() {
-  
-  if(ccs.available()){
-      if(!ccs.readData()){
-        Serial.print("CO2: ");
-        co2int = ccs.geteCO2();
-        CO2Arr[109]=((co2int/32)-12);
-        Serial.print(co2int/32-12);
-        Serial.print("ppm, TVOC: ");
-        tvocint = ccs.getTVOC();
-        TVOCArr[109]=tvocint/10;
-        Serial.println(tvocint);
-        update_data();
-      }
-      else{
-        Serial.println("ERROR!");
-        while(1);
-      }
-    }
-    delay(500);
+
+    
+    if (mySensor.readMeasurement()) // readMeasurement will return true when fresh data is available
+  {
+    Serial.println();
+
+    Serial.print(F("CO2(ppm):"));
+    co2int = mySensor.getCO2();
+    Serial.print(co2int);
+    CO2Arr[109]=((co2int/32)-12);
+
+    Serial.print(F("\tTemperature(C):"));
+    temperature = mySensor.getTemperature();
+    Serial.print(temperature, 1);
+
+    Serial.print(F("\tHumidity(%RH):"));
+    humidity = mySensor.getHumidity();
+    Serial.print(humidity, 1);
+
+    Serial.println();
+    update_data();
+  }
+  else
+    Serial.print(F("."));
+
+  delay(500);
 
 
 }
