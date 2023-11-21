@@ -5,6 +5,8 @@ Worked on 5hrs for v1.
 
 v2 with improved ui took me another 2 hrs.
 
+v3 changed code to work with SCD4X, took me 1hr
+
 related resources:
 
 TFT basic： https://www.youtube.com/watch?v=WFVjsxFMbSM
